@@ -1,0 +1,51 @@
+service: aws-node-express-api-redgistry
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  layers:
+    - arn:aws:lambda:us-east-1:271340019780:layer:NodeDependenciesLayer:1
+    - arn:aws:lambda:us-east-1:271340019780:layer:ServerlessDependenciesLayer:1
+    
+  package:
+    excludeDevDependencies: true
+    exclude:
+      - .git/**
+      - .vscode/**
+      - test/**
+
+  environment:
+    ${file(./configs/${self:provider.stage}.yml)}
+
+  iamRoleStatements: # Permissions for all of your functions can be set here
+    - Effect: Allow
+      Action: # Gives permission to Lambda execution
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+        - s3:PutObject
+        - s3:GetObject
+        - s3:GetObjectVersion
+        - s3:DeleteObject
+      Resource: "*"
+  
+custom:
+  region: ${self:provider.region}
+  stage: ${opt:stage, self:provider.stage}
+  prefix: ${self:custom.stage}-${self:service}
+  process: ${self:custom.prefix}-process
+  config: ${self:custom.prefix}-config
+
+  serverless-offline:
+    noPrependStageInUrl: true
+
+plugins:
+  # - serverless-pseudo-parameters
+  - serverless-offline
+  # - serverless-middleware
+  # - serverless-apigw-binary
+
+functions: ${file(serverless-dynamic.js)}
+ 

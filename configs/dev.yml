@@ -1,0 +1,11 @@
+ENV: dev
+REGION: ${self:custom.region}
+DB_NAME: "postgres"
+DB_HOST: "52.206.80.247"
+DB_PORT: "5432"
+DB_USER: "postgres-admin"
+DB_PASSWORD: "redgistry-dev" 
+AUTH_APPLICATIONID: 2
+AUTH_SCOPES: "read write follow"
+DB_TABLE_USERS: "users"
+DB_TABLE_AUTH_ACCESS_TOKENS: "oauth_access_tokens"
