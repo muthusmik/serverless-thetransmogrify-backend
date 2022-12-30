@@ -1,7 +1,6 @@
 
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
+ 
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);

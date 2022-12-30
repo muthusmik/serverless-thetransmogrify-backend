@@ -59,3 +59,12 @@ update-profile:
         path: services/user/update-profile
         method: post
         cors: true
+
+change-password:
+  handler: src/auth/index.changePassword
+  timeout: 30
+  events:
+    - http:
+        path: services/auth/change-password
+        method: post
+        cors: true

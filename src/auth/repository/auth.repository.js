@@ -4,8 +4,7 @@ const auth0 = require("./../../common/services/auth0-connection.service");
 const ono = require("@jsdevtools/ono");
 const auth0Header = require("../../common/helpers/auth0-header.helper");
 const axios = require("axios");
-const sendMail = require("../../common/services/sendMail");
-const validation = require("../validation/validation");
+ const validation = require("../validation/validation");
 
 const {
   signJWT,
@@ -13,12 +12,7 @@ const {
   generateLoginJWT,
 } = require("../../common/services/auth.jwt");
 
-const {
-  Users,
-  UserRoles,
-    UserSession,
-   Profiles,
-} = models;
+const { Users, UserRoles, UserSession, Profiles } = models;
 
 class AuthRepository extends BaseService {
   constructor(model) {
@@ -32,7 +26,7 @@ class AuthRepository extends BaseService {
     this.getExistingAuth0User = this.getExistingAuth0User.bind(this);
     this.createAuth0User = this.createAuth0User.bind(this);
     this.auth0UserLogin = this.auth0UserLogin.bind(this);
-    this.sendVerifyMail = this.sendVerifyMail.bind(this);
+    
   }
 
   async createUser(createUserDto) {
@@ -52,10 +46,8 @@ class AuthRepository extends BaseService {
         createUserDto.email,
         oauth
       );
-      console.log('exisitingAuth0User.....11',exisitingAuth0User)
 
       if (exisitingAuth0User.status === 200 && exisitingAuth0User.data) {
-
         return {
           status: 409,
           message: "User already exists",
@@ -64,7 +56,7 @@ class AuthRepository extends BaseService {
 
       // If user doesn't exist in auth0 create a user
       const createdAuth0User = await this.createAuth0User(createUserDto, oauth);
-      console.log('createdAuth0User....',createdAuth0User)
+
       if (!createdAuth0User.data) {
         throw ono(createdAuth0User);
       }
@@ -73,18 +65,19 @@ class AuthRepository extends BaseService {
         email: createUserDto.email,
         password: createUserDto.password,
       });
-      console.log('loginUser......',loginUser)
+
       if (!loginUser.data) {
         throw ono(loginUser);
       }
       //Create new user in database with auth0-user-id
 
-      // let hashPassword=validation.hashPassword(createUserDto.password)
-      console.log("loginUser...", loginUser);
+      let hashPassword = validation.hashPassword(createUserDto.password);
+
       const newUserDto = {};
       Object.assign(newUserDto, {
         ...createUserDto,
         auth0_user_id: createdAuth0User.data._id,
+        password: hashPassword,
       });
       newUserDto.is_email_verified = true;
 
@@ -99,7 +92,7 @@ class AuthRepository extends BaseService {
       });
       await UserRoles.create({
         user_id: user.dataValues.id,
-        role_id:6
+        role_id: 6,
       });
 
       await Profiles.create({ user_id: user.dataValues.id });
@@ -135,6 +128,7 @@ class AuthRepository extends BaseService {
         };
       })
       .catch((error) => {
+        console.log("existing aut0 error", error);
         return {
           status: error,
           message: error,
@@ -149,8 +143,7 @@ class AuthRepository extends BaseService {
 
     
     const auth0UserData = {
-      // given_name: userDto.first_name,
-      // family_name: userDto.last_name,
+    
       email: userDto.email,
       password: userDto.password,
       connection: this.auth0Connection,
@@ -217,52 +210,20 @@ class AuthRepository extends BaseService {
         };
       })
       .catch((error) => {
+        
         console.log(error.response.data);
         return error.response.data;
 
-        // return {
-        //   status: error,
-        //   message: error,
-        // };
+        
       });
-
+    console.log("result.............", result);
     return result;
   }
 
-  //   send verification mail by getting user id
-  async sendVerifyMail(userDto) {
-    const user = await this.getById(userDto.id);
+  
 
-    if (user) {
-      const token = await signJWT({ id: user.dataValues.id });
-      this.update(user.dataValues.id, { email_verify_token: token });
-      const isSent = await sendMail([user.dataValues.email], token);
-      return isSent;
-    } else {
-      throw ono({
-        status: 404,
-        message: "No User Found",
-      });
-    }
-  }
-
-  //   verify user by received mail
-  async verifyUser(data) {
-    const decoded = await verifyToken(data.token);
-
-    if (decoded.id) {
-      const updatedUser = await this.update(decoded.id, {
-        email_verify_token: null,
-        is_email_verified: true,
-      });
-      return updatedUser;
-    } else {
-      throw ono({
-        status: 401,
-        message: "Invalid Token",
-      });
-    }
-  }
+ 
+  
 
   async login(loginDto) {
     try {
@@ -272,9 +233,10 @@ class AuthRepository extends BaseService {
       });
 
       if (!loginUser.data) {
-
-
-        throw ono(loginUser);
+            return {
+          statusCode: 400,
+          message: "invalid username or password",
+        };
       }
 
       // fetch user logged in with email id
@@ -297,12 +259,47 @@ class AuthRepository extends BaseService {
 
       return Object.assign({
         // ...loggedInUser.dataValues,
+        statusCode:200,
         access_token: loginUser.data.access_token,
         refresh_token: loginUser.data.refresh_token,
       });
     } catch (e) {
       throw ono(e);
     }
+  }
+
+  async auth0UserPasswordChange(userId, changePasswordDto) {
+    console.log("userId...111", userId);
+    const oauth = await auth0.getAccessToken();
+    const result = await axios
+      .patch(
+        `${this.auth0BaseUrl}/api/v2/users/${userId}`,
+        {
+          connection: this.auth0Connection,
+          password: changePasswordDto.password,
+        },
+        {
+          headers: auth0Header.baseHeaders(oauth),
+          "content-type": "application/x-www-form-urlencoded",
+        }
+      )
+      .then((result) => {
+        return {
+          status: result.status,
+          data: result.data,
+        };
+      })
+      .catch((error) => {
+        return {
+          status: error.response.status,
+          message: error.response.data,
+        };
+      });
+    console.log(
+      "result.......................................................",
+      result
+    );
+    return result;
   }
 
   async getAuth0UserById(userId) {
@@ -329,6 +326,7 @@ class AuthRepository extends BaseService {
           message: error.response.data,
         };
       });
+
     return result;
   }
 
@@ -343,22 +341,53 @@ class AuthRepository extends BaseService {
     }
   }
 
-  // async createRoles(data){
-  //   try{
+  async changeUserPassword(id, changePasswordDto) {
+    try {
+      console.log("id....", id);
+      const user = await this.getById(id);
+      let passwordUpdated = false;
+      console.log("user..", user);
+      const authUser = await this.getAuth0UserById(user.auth0_user_id);
 
-  //    const userRole= await roles.create({
-  //       roleName: data.roleName,
-  //       roleDescription: data.roleDescription,
+      if (authUser.status == "404") {
+        return authUser;
+      } else {
+        const auth0_user_id = authUser.data.user_id;
+        console.log(
+          "before changepassword if cond",
+          changePasswordDto.oldPassword
+        );
+        console.log("user.password", user.password);
+        if (
+          validation.comparePassword(
+            user.password,
+            changePasswordDto.oldPassword
+          )
+        ) {
+          
+          const changePassword = await this.auth0UserPasswordChange(
+            auth0_user_id,
+            {
+              email: changePasswordDto.email,
+              password: changePasswordDto.password,
+              confirmPassword: changePasswordDto.confirmPassword,
+            }
+          );
 
-  //     });
-
-  //     return userRole
-  //   }
-  //   catch(e){
-  //     console.log('inside createRoles e...',e)
-  //           throw ono(e);
-  //   }
-  // }
+           
+          if (changePassword.status == 200) {
+            await this.update(id, {
+              password: validation.hashPassword(changePasswordDto.password),
+            });
+          }
+          return changePassword;
+        }
+        return passwordUpdated;
+      }
+    } catch (e) {
+      throw ono(e);
+    }
+  }
 }
 
 module.exports = new AuthRepository(Users);

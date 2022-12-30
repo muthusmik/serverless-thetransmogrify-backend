@@ -54,6 +54,16 @@ class AuthDto extends BaseDto {
             resourceDescription:body.resourceDescription
         }
     }
+
+    changeUserPassword(body){
+        return {
+            password: body.password,
+            confirmPassword: body.confirmPassword,
+            oldPassword:body.oldPassword
+        };
+    }
+
+
     }
 
 

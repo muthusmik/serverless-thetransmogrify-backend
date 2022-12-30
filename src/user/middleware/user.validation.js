@@ -1,5 +1,22 @@
 const Joi = require("joi");
 
+
+
+
+
+   
+
+const createRole = {
+
+
+  body:Joi.object().keys({
+    roleName:Joi.string().required(),
+    roleDescription:Joi.string().required()
+
+  })
+}
+
+
 const createUserRole = {
   body: Joi.object().keys({
     user_id: Joi.number().required(),
@@ -111,12 +128,7 @@ const addBrandReturnDetails = {
 };
 
 module.exports = {
-  createUserRole,
-  addUserPlatform,
-  addBrandDetails,
-  addBrandShippingDetails,
-  addBrandReturnDetails,
-  addRetailerDetails,
-  updateBrandDetails,
-  updateBrandShippingDetails,
+  createRole
+  
+   
 };

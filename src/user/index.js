@@ -1,20 +1,22 @@
 let userController = require("../user/controller/user.controller");
 //let _ = require("lodash");
 let jwt = require("../auth/middleware/auth.jwt");
+const userValidation = require("./middleware/user.validation");
+const redgidtryValidate = require("../shared/middleware/validate.middleware");
 
 module.exports.createRole = async (event, context, callback) => {
 
 
   try {
 
-
+   
     let token = event.headers.Authorization;
     let req = {
       token,
     };
     if (event.headers.Authorization) {
       let resu = await jwt.verifyJwt(req);
-
+     // redgidtryValidate(userValidation.createRole),
       req.body = JSON.parse(event.body);
 
     let category = await userController.roleCreate(req);
@@ -34,7 +36,7 @@ module.exports.createRole = async (event, context, callback) => {
     });
   } 
   else {
-    return "unauthorized";
+    return callback('Unauthorized')
   }
 
 }catch (err) {
@@ -55,6 +57,7 @@ module.exports.createRole = async (event, context, callback) => {
 
 module.exports.updateRole = async (event, context, callback) => {
   try {
+
     let token = event.headers.Authorization;
     let req = {
       token,
