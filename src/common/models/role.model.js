@@ -8,12 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Role.hasOne(models.brand_user_role, {
-      //   foreignKey: "role_id",
-      // });
-      // Role.hasOne(models.UserRole, {
-      //   foreignKey: "role_id",
-      // });
+      
     }
   }
   Roles.init(
@@ -21,11 +16,17 @@ module.exports = (sequelize, DataTypes) => {
 
       roleName: {type:DataTypes.STRING},
       roleDescription:{type:DataTypes.STRING},
-      
+      createdAt: {
+        field: "created_at",
+        type: DataTypes.DATE,
+      },
+      updatedAt: {
+        field: "updated_at",
+        type: DataTypes.DATE,
+      },
     },
     {
       sequelize,
-      timestamps: false,
     }
   );
   return Roles;

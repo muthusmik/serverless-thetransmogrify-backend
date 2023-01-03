@@ -8,12 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Role.hasOne(models.brand_user_role, {
-      //   foreignKey: "role_id",
-      // });
-      // Role.hasOne(models.UserRole, {
-      //   foreignKey: "role_id",
-      // });
+      
     }
   }
   Users.init(
