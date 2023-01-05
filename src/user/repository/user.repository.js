@@ -65,9 +65,9 @@ class UserRepository extends BaseService {
       userData.gender=data.gender
        
 
-      //userData.role_id = roleData.id;
+     
       await userData.save();
-      console.log('userData...',userData)
+      
       return userData;
     } catch (e) {
       throw ono(e);

@@ -106,6 +106,22 @@ class UserController extends BaseController {
     }
   }
 
+    async getProfile(){
+      try{
+
+        let success = false;
+        let userId = req.user.id 
+        const getProfile = await this.repository.getUserProfiles(userId)
+      }
+      catch(e){
+
+      }
+    }
+
+
+
+
+
   async getRoles(req) {
     try {
      

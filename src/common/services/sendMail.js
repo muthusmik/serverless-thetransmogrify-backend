@@ -5,13 +5,13 @@ const sendMail=async (mailAddress,mailHtml="")=>{
     const params = {
         Source: `${process.env.AWS_SENDER_MAIL}`,
         Destination: {
-          ToAddresses: [...mailAddress],
+          ToAddresses: [process.env.AWS_SENDER_MAIL],
         },
         Message: {
           Body: {
             Html: {
               Charset: "UTF-8",
-              Data: `<p>Welcome to shopdot.</p>
+              Data: `<p>Welcome to redgistry.</p>
                   <html>
       <head>
       
@@ -22,9 +22,8 @@ const sendMail=async (mailAddress,mailHtml="")=>{
         
       </head>
       <body style="background-color: #e9ecef;">
-      <h1>verification mail</h1>
-      <a target="_blank" href=http://localhost:4000/api/v1/auth/verify/${mailHtml}>Click Here to Verify</a>
-      
+      <h1>Your OTP is ${mailHtml}</h1>
+       
       </body>
       </html>`,
             },

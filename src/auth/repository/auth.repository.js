@@ -4,16 +4,19 @@ const auth0 = require("./../../common/services/auth0-connection.service");
 const ono = require("@jsdevtools/ono");
 const auth0Header = require("../../common/helpers/auth0-header.helper");
 const axios = require("axios");
- const validation = require("../validation/validation");
+const validation = require("../validation/validation");
+const sendEmail = require("../../common/services/sendMail");
+const constants = require("../../common/constants.config");
 
-const {
-  signJWT,
-  verifyToken,
-  generateLoginJWT,
-} = require("../../common/services/auth.jwt");
+const { Op } = require("sequelize");
 
 const { Users, UserRoles, UserSession, Profiles } = models;
-
+const sendOtp = require("../../common/services/send.otp");
+const {
+  modifyResponseForVerifyOtp,
+  retryAttemptsForVerifyOtp,
+} = require("../../common/helpers/auth.helpers");
+const e = require("express");
 class AuthRepository extends BaseService {
   constructor(model) {
     super(model);
@@ -26,7 +29,6 @@ class AuthRepository extends BaseService {
     this.getExistingAuth0User = this.getExistingAuth0User.bind(this);
     this.createAuth0User = this.createAuth0User.bind(this);
     this.auth0UserLogin = this.auth0UserLogin.bind(this);
-    
   }
 
   async createUser(createUserDto) {
@@ -71,19 +73,35 @@ class AuthRepository extends BaseService {
       }
       //Create new user in database with auth0-user-id
 
-      let hashPassword = validation.hashPassword(createUserDto.password);
+      // let OTP = constants.genOtp();
+      // console.log("OTP....", OTP);
+      // let mailSend = await sendEmail("", OTP);
+      let html = "";
+      let OTP = await sendOtp(createUserDto.email, html);
 
+      console.log("OTP.............", OTP);
+      let hashPassword = validation.hashPassword(createUserDto.password);
+      let todayDate = new Date();
+       
+       //todayDate.getDate() + constants.expiration.otpExpireInDays
+       
+       
+
+      const  expiredDate = todayDate.setMinutes(todayDate.getMinutes()+5);
       const newUserDto = {};
       Object.assign(newUserDto, {
         ...createUserDto,
         auth0_user_id: createdAuth0User.data._id,
         password: hashPassword,
+        otp: OTP,
+        otp_expiration: expiredDate,
+        access_token: loginUser.data.access_token,
       });
       newUserDto.is_email_verified = true;
 
       delete newUserDto.device_id;
       const user = await this.create(newUserDto);
-
+      
       await UserSession.create({
         user_id: user.dataValues.id,
         access_token: loginUser.data.access_token,
@@ -97,9 +115,10 @@ class AuthRepository extends BaseService {
 
       await Profiles.create({ user_id: user.dataValues.id });
       return Object.assign({
-        ...user.dataValues,
-        access_token: loginUser.data.access_token,
-        refresh_token: loginUser.data.refresh_token,
+        // ...user.dataValues,
+        message: constants.otpMessage,
+        // access_token: loginUser.data.access_token,
+        // refresh_token: loginUser.data.refresh_token,
       });
     } catch (e) {
       console.log("e.,,,,", e);
@@ -141,22 +160,22 @@ class AuthRepository extends BaseService {
 
   async createAuth0User(userDto, oauth) {
 
-    
+
     const auth0UserData = {
-    
+
       email: userDto.email,
       password: userDto.password,
       connection: this.auth0Connection,
       client_id: this.auth0ClientId,
     };
-     
+
 
     const auth0User = await axios
       .post(`${this.auth0BaseUrl}/dbconnections/signup`, auth0UserData, {
-        headers: {'Authorization':auth0Header.baseHeaders(oauth).Authorization}
+        headers: { 'Authorization': auth0Header.baseHeaders(oauth).Authorization }
       })
       .then((result) => {
-       
+
         return {
           status: result.status,
           data: result.data,
@@ -170,7 +189,7 @@ class AuthRepository extends BaseService {
           message: error.response.data.error,
         };
       });
-     
+
     return auth0User;
   }
 
@@ -210,20 +229,12 @@ class AuthRepository extends BaseService {
         };
       })
       .catch((error) => {
-        
         console.log(error.response.data);
         return error.response.data;
-
-        
       });
-    console.log("result.............", result);
+   
     return result;
   }
-
-  
-
- 
-  
 
   async login(loginDto) {
     try {
@@ -233,7 +244,7 @@ class AuthRepository extends BaseService {
       });
 
       if (!loginUser.data) {
-            return {
+        return {
           statusCode: 400,
           message: "invalid username or password",
         };
@@ -259,7 +270,7 @@ class AuthRepository extends BaseService {
 
       return Object.assign({
         // ...loggedInUser.dataValues,
-        statusCode:200,
+        statusCode: 200,
         access_token: loginUser.data.access_token,
         refresh_token: loginUser.data.refresh_token,
       });
@@ -295,10 +306,7 @@ class AuthRepository extends BaseService {
           message: error.response.data,
         };
       });
-    console.log(
-      "result.......................................................",
-      result
-    );
+
     return result;
   }
 
@@ -353,18 +361,13 @@ class AuthRepository extends BaseService {
         return authUser;
       } else {
         const auth0_user_id = authUser.data.user_id;
-        console.log(
-          "before changepassword if cond",
-          changePasswordDto.oldPassword
-        );
-        console.log("user.password", user.password);
+
         if (
           validation.comparePassword(
             user.password,
             changePasswordDto.oldPassword
           )
         ) {
-          
           const changePassword = await this.auth0UserPasswordChange(
             auth0_user_id,
             {
@@ -374,7 +377,6 @@ class AuthRepository extends BaseService {
             }
           );
 
-           
           if (changePassword.status == 200) {
             await this.update(id, {
               password: validation.hashPassword(changePasswordDto.password),
@@ -387,6 +389,51 @@ class AuthRepository extends BaseService {
     } catch (e) {
       throw ono(e);
     }
+  }
+
+  async verifyOtp(body) {
+
+    try {
+      const existingUser = await Users.findOne({
+        where: { email: body.email },
+        otp_expiration: {
+          [Op.gte]: new Date(),
+        },
+      });
+
+      if (
+        parseInt(existingUser.no_of_attempts) >=
+        parseInt(constants.otpNoOfAttempts)
+      ) {
+        let message = {
+            message:constants.otpNoOfAttemptsMessage,
+            success:false
+        }
+        return message;
+      }
+
+      if (parseInt(existingUser.otp) !== parseInt(body.otp)) {
+        let result = await retryAttemptsForVerifyOtp(existingUser);
+        console.log(result)
+        let message = {
+          message:constants.INVALID_OTP,
+          status:false
+      }
+        return message;
+      }  
+     let result = await modifyResponseForVerifyOtp(existingUser);
+     return result;
+      
+    } catch (e) {
+      return e;
+    }
+  }
+
+
+  async logOut(userId){
+
+
+
   }
 }
 

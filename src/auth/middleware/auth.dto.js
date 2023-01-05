@@ -1,3 +1,4 @@
+const { body } = require('express-validator');
 const BaseDto = require('../../common/dto/base.dto');
 const { User } = require('../../common/models');
 
@@ -61,6 +62,15 @@ class AuthDto extends BaseDto {
             confirmPassword: body.confirmPassword,
             oldPassword:body.oldPassword
         };
+    }
+
+    verifyOtpDto(body){
+        console.log('inside verifyOtpDto')
+
+        return{
+            email:body.email,
+            otp:body.otp
+        }
     }
 
 

@@ -25,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
         field: "updated_at",
         type: DataTypes.DATE,
       },
+      otp:{type:DataTypes.STRING},
+      otp_expiration: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      access_token:{type:DataTypes.STRING},
+
+      no_of_attempts:{type:DataTypes.STRING}
     },
     {
       sequelize,

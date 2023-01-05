@@ -3,7 +3,14 @@ const authRepository = require("../repository/auth.repository");
 const authDto = require("../middleware/auth.dto");
 const responseService = require("../../common/services/response.service");
 const validation = require("../../shared/middleware/validate.middleware");
-const {signUpRequiredFields,loginRequiredFields,changePasswordRequiredFields} = require("../middleware/auth.validation");
+const {
+  signUpRequiredFields,
+  loginRequiredFields,
+  changePasswordRequiredFields,
+} = require("../middleware/auth.validation");
+// const sendEmail= require("../../shared/services/email.serives")
+const sendEmail = require("../../common/services/sendMail");
+const constants = require("../../common/constants.config");
 
 class AuthController extends BaseController {
   constructor(respService, repository, dto) {
@@ -11,14 +18,12 @@ class AuthController extends BaseController {
     this.repository = repository;
     this.create = this.create.bind(this);
     this.login = this.login.bind(this);
-   
   }
 
   async create(req) {
     try {
-	
-     let requiredFields= await signUpRequiredFields()
-         
+      let requiredFields = await signUpRequiredFields();
+
       if (req) {
         let validate = await validation.validation(req, requiredFields);
 
@@ -31,9 +36,9 @@ class AuthController extends BaseController {
       const createDto = this.dto.createUser(req);
 
       const record = await this.repository.createUser(createDto);
-		console.log('');
-      // this.responseService.created(req, res, record);
-      return { success: !success, data: record };
+     
+       
+      return { success: !success, data:record };
     } catch (e) {
       return e;
     }
@@ -41,13 +46,12 @@ class AuthController extends BaseController {
 
   async login(req) {
     try {
+      let requiredFields = await loginRequiredFields();
 
-      let requiredFields= await loginRequiredFields()
-
-      console.log('requiredFields',requiredFields)
+      console.log("requiredFields", requiredFields);
       if (req) {
         let validate = await validation.validation(req, requiredFields);
-          
+
         if (validate.data.statusCode === 400) {
           return validate;
         }
@@ -58,30 +62,46 @@ class AuthController extends BaseController {
 
       const login = await this.repository.login(loginDto);
 
-      console.log('login...',login)
-        if(login.statusCode === 400)
-        {
-          return { success: success, data: login };
-        }
+      if (login.statusCode === 400) {
+        return { success: success, data: login };
+      }
       return { success: !success, data: login };
-      //this.responseService.success(req, res, record);
     } catch (e) {
       delete e.stack;
       return e;
     }
   }
 
-  
+  async otpVerification(req, res) {
+    try {
+     
+      let success = false;
 
+      const otpDto = this.dto.verifyOtpDto(req);
+
+      const verifyOtp = await this.repository.verifyOtp(otpDto);
+      return { success: !success, data: verifyOtp };
+    } catch (e) {
+
+      return e
+    }
+  }
+
+  async logOut(req){
+    let success = false;
+    let id=req.user.id
+    const logout = await this.repository.logOut(otpDto);
+      return { success: !success, data: logout };
+  }
+
+    
   async changePassword(req, res) {
     try {
+      let requiredFields = await changePasswordRequiredFields();
 
-
-      let requiredFields= await changePasswordRequiredFields()
-      
       if (req.body) {
         let validate = await validation.validation(req.body, requiredFields);
-        
+
         if (validate.data.statusCode === 400) {
           return validate;
         }
