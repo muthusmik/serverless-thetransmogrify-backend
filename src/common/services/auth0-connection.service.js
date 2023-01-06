@@ -37,8 +37,7 @@ class AuthConnection {
         };
       })
       .catch((error) => {
-        console.log('error....',error)
-        return {
+         return {
           status: error.response.status,
           message: error.response.data.error_description,
         };

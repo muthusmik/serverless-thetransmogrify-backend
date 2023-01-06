@@ -46,6 +46,7 @@ module.exports = {
         apiVersion: "2010-12-01"
     },
     otpNoOfAttempts:'3',
+   
     otpNoOfAttemptsMessage:"You've reached the maximum no.of.attempts!.try Resend OTP  and try again!",
     expiration:{
         otpExpireInDays:1

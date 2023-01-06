@@ -7,6 +7,7 @@ const axios = require("axios");
 const validation = require("../validation/validation");
 const sendEmail = require("../../common/services/sendMail");
 const constants = require("../../common/constants.config");
+const bcrypt = require('bcryptjs');
 
 const { Op } = require("sequelize");
 
@@ -34,8 +35,7 @@ class AuthRepository extends BaseService {
   async createUser(createUserDto) {
     try {
       // Get auth0 access token
-
-      const oauth = await auth0.getAccessToken();
+       const oauth = await auth0.getAccessToken();
 
       if (oauth.status < 200 && oauth.status > 299) {
         throw ono({
@@ -71,30 +71,24 @@ class AuthRepository extends BaseService {
       if (!loginUser.data) {
         throw ono(loginUser);
       }
-      //Create new user in database with auth0-user-id
-
-      // let OTP = constants.genOtp();
-      // console.log("OTP....", OTP);
-      // let mailSend = await sendEmail("", OTP);
-      let html = "";
-      let OTP = await sendOtp(createUserDto.email, html);
-
-      console.log("OTP.............", OTP);
+      
+     
+ 
       let hashPassword = validation.hashPassword(createUserDto.password);
-      let todayDate = new Date();
+     //let todayDate = new Date();
        
        //todayDate.getDate() + constants.expiration.otpExpireInDays
        
        
 
-      const  expiredDate = todayDate.setMinutes(todayDate.getMinutes()+5);
+    //  const  expiredDate = todayDate.setMinutes(todayDate.getMinutes()+5);
       const newUserDto = {};
       Object.assign(newUserDto, {
         ...createUserDto,
         auth0_user_id: createdAuth0User.data._id,
         password: hashPassword,
-        otp: OTP,
-        otp_expiration: expiredDate,
+        // otp: otpData.OTP,
+        // otp_expiration: otpData.otpExpiredAt,
         access_token: loginUser.data.access_token,
       });
       newUserDto.is_email_verified = true;
@@ -102,6 +96,9 @@ class AuthRepository extends BaseService {
       delete newUserDto.device_id;
       const user = await this.create(newUserDto);
       
+      let html = "";
+     await sendOtp(createUserDto.email, html,user);
+
       await UserSession.create({
         user_id: user.dataValues.id,
         access_token: loginUser.data.access_token,
@@ -242,8 +239,7 @@ class AuthRepository extends BaseService {
         email: loginDto.email,
         password: loginDto.password,
       });
-
-      if (!loginUser.data) {
+       if (!loginUser.data) {
         return {
           statusCode: 400,
           message: "invalid username or password",
@@ -251,8 +247,14 @@ class AuthRepository extends BaseService {
       }
 
       // fetch user logged in with email id
-      const loggedInUser = await this.model.findOne({ email: loginUser.email });
-      // console.log('login user...',loggedInUser)
+      let loggedInUser = await this.model.findOne({where:{email: loginDto.email}});
+       
+ 
+
+      loggedInUser.access_token = loginUser.data.access_token
+      await  loggedInUser.save();
+
+     
 
       // remove sessions with already existing device id
       await UserSession.destroy({
@@ -349,12 +351,55 @@ class AuthRepository extends BaseService {
     }
   }
 
+  // async changeUserPassword(id, changePasswordDto) {
+  //   try {
+  //     console.log("id....", id);
+  //     const user = await this.getById(id);
+  //     let passwordUpdated = false;
+  //     console.log("user..", user);
+  //     const authUser = await this.getAuth0UserById(user.auth0_user_id);
+
+  //     if (authUser.status == "404") {
+  //       return authUser;
+  //     } else {
+  //       const auth0_user_id = authUser.data.user_id;
+
+  //       if (
+  //         validation.comparePassword(
+  //           user.password,
+  //           changePasswordDto.oldPassword
+  //         )
+  //       ) {
+  //         const changePassword = await this.auth0UserPasswordChange(
+  //           auth0_user_id,
+  //           {
+  //             email: changePasswordDto.email,
+  //             password: changePasswordDto.password,
+  //             confirmPassword: changePasswordDto.confirmPassword,
+  //           }
+  //         );
+
+  //         if (changePassword.status == 200) {
+  //           await this.update(id, {
+  //             password: validation.hashPassword(changePasswordDto.password),
+  //           });
+  //         }
+  //         return changePassword;
+  //       }
+  //       return passwordUpdated;
+  //     }
+  //   } catch (e) {
+  //     throw ono(e);
+  //   }
+  // }
+
+
   async changeUserPassword(id, changePasswordDto) {
     try {
-      console.log("id....", id);
+     
       const user = await this.getById(id);
       let passwordUpdated = false;
-      console.log("user..", user);
+      
       const authUser = await this.getAuth0UserById(user.auth0_user_id);
 
       if (authUser.status == "404") {
@@ -362,12 +407,7 @@ class AuthRepository extends BaseService {
       } else {
         const auth0_user_id = authUser.data.user_id;
 
-        if (
-          validation.comparePassword(
-            user.password,
-            changePasswordDto.oldPassword
-          )
-        ) {
+        
           const changePassword = await this.auth0UserPasswordChange(
             auth0_user_id,
             {
@@ -383,13 +423,16 @@ class AuthRepository extends BaseService {
             });
           }
           return changePassword;
-        }
-        return passwordUpdated;
+         
+       // return passwordUpdated;
       }
     } catch (e) {
       throw ono(e);
     }
   }
+
+
+
 
   async verifyOtp(body) {
 
@@ -400,7 +443,9 @@ class AuthRepository extends BaseService {
           [Op.gte]: new Date(),
         },
       });
-
+      if(!existingUser){
+        return 'user does not exists'
+      }
       if (
         parseInt(existingUser.no_of_attempts) >=
         parseInt(constants.otpNoOfAttempts)
@@ -431,10 +476,63 @@ class AuthRepository extends BaseService {
 
 
   async logOut(userId){
+        // try{
+        //   const user = await Users.findOne({
+        //     where: { id: userId },
+            
+        //   });
+        //   console.log('user  before  logout',user)
+
+        //   user.access_token=null
+        //   console.log('user  after logout',user)
+        // }
+        // catch(e){
+
+        // }
 
 
+        try{
+
+                  const user = await Users.findOne({
+            where: { id: userId },
+            
+          });
+         
+
+          console.log('user  before  logout',user.access_token)
+          let randomNumberToAppend = toString(Math.floor((Math.random() * 1000) + 1));
+          let randomIndex = Math.floor((Math.random() * 10) + 1);
+          let hashedRandomNumberToAppend = await bcrypt.hash(randomNumberToAppend, 10);
+      
+           
+          user.access_token = user.access_token + hashedRandomNumberToAppend;
+           
+          return  'logout successfully!';
+      }catch(err){
+          return  err
+      }
 
   }
+
+  
+async resendOtp(userData){
+  
+let message=''
+  const user = await Users.findOne({
+    where: { email: userData.email },
+    
+  });
+ 
+  if(!user){
+    message='user does not exists!'
+    return  message
+  }
+  let html = ''
+    await sendOtp(userData.email, html,user);
+  message=constants.otpMessage
+  return message
 }
+}
+
 
 module.exports = new AuthRepository(Users);

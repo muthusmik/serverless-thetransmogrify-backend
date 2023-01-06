@@ -36,9 +36,8 @@ class AuthController extends BaseController {
       const createDto = this.dto.createUser(req);
 
       const record = await this.repository.createUser(createDto);
-     
-       
-      return { success: !success, data:record };
+
+      return { success: !success, data: record };
     } catch (e) {
       return e;
     }
@@ -48,7 +47,6 @@ class AuthController extends BaseController {
     try {
       let requiredFields = await loginRequiredFields();
 
-      console.log("requiredFields", requiredFields);
       if (req) {
         let validate = await validation.validation(req, requiredFields);
 
@@ -74,7 +72,6 @@ class AuthController extends BaseController {
 
   async otpVerification(req, res) {
     try {
-     
       let success = false;
 
       const otpDto = this.dto.verifyOtpDto(req);
@@ -82,19 +79,78 @@ class AuthController extends BaseController {
       const verifyOtp = await this.repository.verifyOtp(otpDto);
       return { success: !success, data: verifyOtp };
     } catch (e) {
+      return e;
+    }
+  }
+  async resendOtp(req) {
+    try {
+      let success = false;
 
+      const resendOtpDto = this.dto.resendOtpDto(req);
+      const otp = await this.repository.resendOtp(resendOtpDto);
+      return { success: !success, data: otp };
+    } catch (e) {
+      return e;
+    }
+  }
+
+
+  async logOut(req) {
+
+    try{
+    let success = false;
+    let id = req.user.id;
+    const logout = await this.repository.logOut(id);
+    return { success: !success, data: logout };
+    }
+    catch(e){
       return e
     }
   }
 
-  async logOut(req){
-    let success = false;
-    let id=req.user.id
-    const logout = await this.repository.logOut(otpDto);
-      return { success: !success, data: logout };
-  }
+  // async changePassword(req, res) {
+  //   try {
+  //     let requiredFields = await changePasswordRequiredFields();
 
-    
+  //     if (req.body) {
+  //       let validate = await validation.validation(req.body, requiredFields);
+
+  //       if (validate.data.statusCode === 400) {
+  //         return validate;
+  //       }
+  //     }
+  //     let success = false;
+  //     const id = req.user.id;
+  //     const changePasswordDto = this.dto.changeUserPassword(req.body);
+  //     if (changePasswordDto.password != changePasswordDto.confirmPassword) {
+  //       return {
+  //         success: success,
+  //         data: "password and confirm password must be same",
+  //       };
+  //     }
+
+  //     const changePassword = await this.repository.changeUserPassword(
+  //       id,
+  //       changePasswordDto
+  //     );
+
+  //     if (!changePassword)
+  //       return {
+  //         success: success,
+  //         data: "Old password does not match. Pleae try again!!",
+  //       };
+
+  //     if (changePassword.status == 200) {
+  //       return { success: success, data: "password changed successfully" };
+  //     } else {
+  //       return { success: !success, data: changePassword };
+  //     }
+  //   } catch (e) {
+  //     return e;
+  //   }
+  // }
+
+
   async changePassword(req, res) {
     try {
       let requiredFields = await changePasswordRequiredFields();
@@ -112,7 +168,7 @@ class AuthController extends BaseController {
       if (changePasswordDto.password != changePasswordDto.confirmPassword) {
         return {
           success: success,
-          data: "password and confirm password must be same",
+          data: "password and confirm password must be same!",
         };
       }
 
@@ -120,15 +176,10 @@ class AuthController extends BaseController {
         id,
         changePasswordDto
       );
-
-      if (!changePassword)
-        return {
-          success: success,
-          data: "Old password does not match. Pleae try again!!",
-        };
+ 
 
       if (changePassword.status == 200) {
-        return { success: success, data: "password changed successfully" };
+        return { success: success, data: "password changed successfully!" };
       } else {
         return { success: !success, data: changePassword };
       }

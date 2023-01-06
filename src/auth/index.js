@@ -146,12 +146,7 @@ module.exports.verifyOtp = async(event, context,callback) => {
 
     
     try {
- 
-     
-        console.log("befor testing working fine1111111111", );
 
-
-      console.log("befor testing working fine", );
 
         let category = await AuthController.otpVerification(body);
         console.log("testing working fine",category);
@@ -186,12 +181,142 @@ module.exports.verifyOtp = async(event, context,callback) => {
         })
     }
 
-}        
+}  
+
+
+
+module.exports.resendOtp = async(event, context,callback) => {
+    
    
- 
+    let body = JSON.parse(event.body);
+    
+    try {
+    
 
- 
- 
+        let category = await AuthController.resendOtp(body);
+       
+        
+            callback(null, {
+                statusCode: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":"*",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+                    "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+                },
+                body: JSON.stringify(category)
+            })
+    
+}
+catch (err) {
+    callback(null, {
+        statusCode: err.statusCode || 500,
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin":"*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+            "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        },
+        body: JSON.stringify(err)
+    })
+}
+}
+
+module.exports.forgotPassword = async(event, context,callback) => {
+    
+   
+    let body = JSON.parse(event.body);
+    
+    try {
+    
+
+        let category = await AuthController.resendOtp(body);
+       
+        
+            callback(null, {
+                statusCode: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":"*",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+                    "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+                },
+                body: JSON.stringify(category)
+            })
+    
+}
+catch (err) {
+    callback(null, {
+        statusCode: err.statusCode || 500,
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin":"*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+            "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        },
+        body: JSON.stringify(err)
+    })
+}
+}
 
 
- 
+module.exports.logOut = async(event, context,callback) => {
+    
+   
+   
+    
+    try {
+
+        let token = event.headers.Authorization;
+    let req = {
+      token,
+    };
+    if (event.headers.Authorization) {
+      let resu = await jwt.verifyJwt(req);
+
+      req.body = JSON.parse(event.body);
+
+        let category = await AuthController.logOut(req);
+        console.log("testing working fine",category);
+        
+            callback(null, {
+                statusCode: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":"*",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+                    "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+                },
+                body: JSON.stringify(category)
+            })
+      
+    }
+
+    else{
+        return "unauthorized"
+    }
+}
+    catch (err) {
+        callback(null, {
+            statusCode: err.statusCode || 500,
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin":"*",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+                "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+            },
+            body: JSON.stringify(err)
+        })
+
+         
+    }
+}
+
+
+   

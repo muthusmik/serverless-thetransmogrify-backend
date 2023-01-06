@@ -16,49 +16,31 @@ auth-login:
         method: post
         cors: true
 
-role:
-  handler: src/user/index.createRole
+verify-otp:
+  handler: src/auth/index.verifyOtp
   timeout: 30
   events:
     - http:
-        path: services/user/createRole
+        path: services/auth/verify-otp
         method: post
         cors: true
 
-get-roles:
-  handler: src/user/index.getRoles
+resend-otp:
+  handler: src/auth/index.resendOtp
   timeout: 30
   events:
     - http:
-        path: services/user/getRoles
-        method: get
-        cors: true
-
-get-UserRoles:
-  handler: src/user/index.getUserRoles
-  timeout: 30
-  events:
-    - http:
-        path: services/user/getUserRoles
+        path: services/auth/resend-otp
         method: post
         cors: true
-update-role:
-  handler: src/user/index.updateRole
+        
+forgot-password:
+  handler: src/auth/index.forgotPassword
   timeout: 30
   events:
     - http:
-        path: services/user/updateRole
+        path: services/auth/forgot-password
         method: post
-        cors: true
-    
-update-profile:
-  handler: src/user/index.updateProfile
-  timeout: 30
-  events:
-    - http:
-        path: services/user/update-profile
-        method: post
-        cors: true
 
 change-password:
   handler: src/auth/index.changePassword
@@ -66,5 +48,13 @@ change-password:
   events:
     - http:
         path: services/auth/change-password
+        method: post
+        cors: true
+logout:
+  handler: src/auth/index.logOut
+  timeout: 30
+  events:
+    - http:
+        path: services/auth/logOut
         method: post
         cors: true

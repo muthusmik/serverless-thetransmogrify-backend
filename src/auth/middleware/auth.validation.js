@@ -24,7 +24,7 @@ exports.changePasswordRequiredFields = async () => {
     let requiredFields = {
          password: "",
         confirmPassword:"",
-         oldPassword:"",
+         
      };
      return requiredFields
 

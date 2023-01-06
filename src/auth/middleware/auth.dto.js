@@ -60,17 +60,26 @@ class AuthDto extends BaseDto {
         return {
             password: body.password,
             confirmPassword: body.confirmPassword,
-            oldPassword:body.oldPassword
+           // oldPassword:body.oldPassword
         };
     }
 
     verifyOtpDto(body){
-        console.log('inside verifyOtpDto')
+         
 
         return{
             email:body.email,
             otp:body.otp
         }
+    }
+    resendOtpDto(body){
+
+
+        return{
+            email:body.email,
+            
+        }
+
     }
 
 

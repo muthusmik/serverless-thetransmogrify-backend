@@ -1,0 +1,53 @@
+role:
+  handler: src/user/index.createRole
+  timeout: 30
+  events:
+    - http:
+        path: services/user/createRole
+        method: post
+        cors: true
+
+get-roles:
+  handler: src/user/index.getRoles
+  timeout: 30
+  events:
+    - http:
+        path: services/user/getRoles
+        method: get
+        cors: true
+
+get-UserRoles:
+  handler: src/user/index.getUserRoles
+  timeout: 30
+  events:
+    - http:
+        path: services/user/getUserRoles
+        method: post
+        cors: true
+
+update-role:
+  handler: src/user/index.updateRole
+  timeout: 30
+  events:
+    - http:
+        path: services/user/updateRole
+        method: post
+        cors: true
+
+update-profile:
+  handler: src/user/index.updateProfile
+  timeout: 30
+  events:
+    - http:
+        path: services/user/update-profile
+        method: post
+        cors: true
+
+get-profile:
+  handler: src/user/index.getProfile
+  timeout: 30
+  events:
+    - http:
+        path: services/user/get-profile
+        method: get
+        cors: true

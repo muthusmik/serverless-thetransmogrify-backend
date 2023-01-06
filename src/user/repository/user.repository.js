@@ -1,8 +1,7 @@
 const BaseService = require("../../common/services/base.service");
 const models = require("../../common/models");
 const ono = require("@jsdevtools/ono");
-const { signJWT } = require("../../common/services/auth.jwt");
-
+ const {modifyResponseForGetProfiles} = require('../../common/helpers/users.helpers')
 const { Users, UserRoles, Roles ,Profiles} = models;
 
 class UserRepository extends BaseService {
@@ -14,13 +13,11 @@ class UserRepository extends BaseService {
   async createRoles(data) {
     try {
 
-      console.log(data,'....................................data')
-      const role = await Roles.create({
+       const role = await Roles.create({
         roleName: data.roleName,
         roleDescription: data.roleDescription,
       });
-      console.log(role,'....................................role')
-
+ 
       return role;
     } catch (e) {
       throw ono(e);
@@ -57,15 +54,11 @@ class UserRepository extends BaseService {
         attribute: ["id", "firstName", "lastName","dob","gender","user_id"],
       });
 
-     
-     
       userData.firstName = data.firstName,
       userData.lastName=data.lastName,
       userData.dob=data.dob,
       userData.gender=data.gender
-       
-
-     
+  
       await userData.save();
       
       return userData;
@@ -84,6 +77,23 @@ class UserRepository extends BaseService {
     }
     catch(e){
       throw ono(e);
+    }
+  }
+
+  async getUserProfiles(userId){
+    try{
+
+       
+
+      const userData = await Profiles.findOne({
+        where: { user_id: userId },
+        attribute: ["id", "firstName", "lastName","dob","gender","user_id"],
+      });
+      return userData
+      
+    }
+    catch(e){
+      return e 
     }
   }
   

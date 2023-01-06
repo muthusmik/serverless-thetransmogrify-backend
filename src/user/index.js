@@ -199,7 +199,8 @@ module.exports.getProfile = async (event, context, callback) => {
     if (event.headers.Authorization) {
       let resu = await jwt.verifyJwt(req);
 
-      req.body = JSON.parse(event.body);
+       req.body = JSON.parse(event.body);
+      console.log("testing   req....", resu);
 
       let category = await userController.getProfile(req);
       console.log("testing working fine....", category);
