@@ -4,7 +4,13 @@ const userDto = require("../middleware/user.dto");
 const responseService = require("../../common/services/response.service");
 const validation = require("../../shared/middleware/validate.middleware");
 const userValidation = require("../middleware/user.validation");
-
+const {
+ 
+  
+  roleCreateRequiredFields,
+ 
+} = require("../middleware/user.validation");
+ 
 class UserController extends BaseController {
   constructor(respService, repository, dto) {
     super(respService, repository, dto);
@@ -12,20 +18,21 @@ class UserController extends BaseController {
     this.roleCreate = this.roleCreate.bind(this);
   }
 
-  async roleCreate(req, res) {
+  async roleCreate(req) {
     try {
-      let requiredFields = {
-        roleName: "",
-        roleDescription: "",
-      };
-      if (req.body) {
-        let validate = await validation.validation(req.body, requiredFields);
 
-        if (validate.data.statusCode === 400) {
-          return validate;
-        }
-      }
       let success = false;
+
+      
+      let requiredFields = await roleCreateRequiredFields();
+      let validations = await fieldValidation(req, requiredFields);     
+      
+         
+
+        if (validations.statusCode === 400) {
+          return { success: success, data:validations };
+        }
+      
       const roleCreateDto = this.dto.roleCreateDto(req.body);
 
       const record = await this.repository.createRoles(roleCreateDto);
@@ -38,17 +45,17 @@ class UserController extends BaseController {
 
   async updateUserRole(req) {
     try {
-      let requiredFields = {
-        roleName: "",
-      };
-      if (req.body) {
-        let validate = await validation.validation(req.body, requiredFields);
+      let success = false;
+
+      
+      let requiredFields = await roleCreateRequiredFields();
+      let validations = await fieldValidation(req.body, requiredFields);     
+      
+         
 
         if (validate.data.statusCode === 400) {
-          return validate;
+          return { success: success, data:validations };
         }
-      }
-      let success = false;
       const updateRoleDto = this.dto.updateRole(req.body);
 
      

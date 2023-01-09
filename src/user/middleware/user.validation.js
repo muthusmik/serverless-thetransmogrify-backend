@@ -3,8 +3,18 @@ const Joi = require("joi");
 
 
 
+let requiredFieldss = {
+  roleName: "",
+  roleDescription: "",
+};
 
-   
+exports.roleCreateRequiredFields = async () => {
+  let requiredFields = {
+    roleName: "",
+    roleDescription: "",
+  };
+  return requiredFields;
+};
 
 const createRole = {
 

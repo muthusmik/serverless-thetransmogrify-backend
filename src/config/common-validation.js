@@ -1,6 +1,7 @@
 
 const bcrypt = require('bcryptjs');
- 
+const validation = require("../shared/middleware/validate.middleware");
+
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);

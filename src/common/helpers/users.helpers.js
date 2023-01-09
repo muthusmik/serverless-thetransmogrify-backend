@@ -9,10 +9,8 @@ exports.modifyResponseForGetProfiles = async (userdata)=>{
                  
                 id: userdata.id,
                 
-                // access_token:existingUser.access_token,
-                // message:constants.OTP_SUCCESS_MESSAGE
+             
             }
-             console.log('data..............................',data)
              return data
     }
     catch(e){

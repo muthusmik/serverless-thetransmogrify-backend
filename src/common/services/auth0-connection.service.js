@@ -13,9 +13,7 @@ class AuthConnection {
   
   async getAccessToken() {
     
-    console.log("clientid",process.env.AUTH0_CLIENT_ID);
-    console.log("baseUrl",process.env.AUTH0_API_BASE_URL);
-    console.log("clientSecret",process.env.AUTH0_CLIENT_SECRET);
+   
     var options = {
       method: "POST",
       url: this.baseUrl + "/oauth/token",

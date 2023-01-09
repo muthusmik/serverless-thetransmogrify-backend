@@ -7,7 +7,7 @@ const axios = require("axios");
 const validation = require("../validation/validation");
 const sendEmail = require("../../common/services/sendMail");
 const constants = require("../../common/constants.config");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 
 const { Op } = require("sequelize");
 
@@ -17,7 +17,6 @@ const {
   modifyResponseForVerifyOtp,
   retryAttemptsForVerifyOtp,
 } = require("../../common/helpers/auth.helpers");
-const e = require("express");
 class AuthRepository extends BaseService {
   constructor(model) {
     super(model);
@@ -35,8 +34,8 @@ class AuthRepository extends BaseService {
   async createUser(createUserDto) {
     try {
       // Get auth0 access token
-       const oauth = await auth0.getAccessToken();
-
+      const oauth = await auth0.getAccessToken();
+      console.log('oauth.....',oauth)
       if (oauth.status < 200 && oauth.status > 299) {
         throw ono({
           status: 500,
@@ -58,8 +57,10 @@ class AuthRepository extends BaseService {
 
       // If user doesn't exist in auth0 create a user
       const createdAuth0User = await this.createAuth0User(createUserDto, oauth);
-
+      console.log("createdAuth0User....", createdAuth0User);
       if (!createdAuth0User.data) {
+        console.log("createdAuth0User.... inside ");
+
         throw ono(createdAuth0User);
       }
 
@@ -71,17 +72,13 @@ class AuthRepository extends BaseService {
       if (!loginUser.data) {
         throw ono(loginUser);
       }
-      
-     
- 
-      let hashPassword = validation.hashPassword(createUserDto.password);
-     //let todayDate = new Date();
-       
-       //todayDate.getDate() + constants.expiration.otpExpireInDays
-       
-       
 
-    //  const  expiredDate = todayDate.setMinutes(todayDate.getMinutes()+5);
+      let hashPassword = validation.hashPassword(createUserDto.password);
+      //let todayDate = new Date();
+
+      //todayDate.getDate() + constants.expiration.otpExpireInDays
+
+      //  const  expiredDate = todayDate.setMinutes(todayDate.getMinutes()+5);
       const newUserDto = {};
       Object.assign(newUserDto, {
         ...createUserDto,
@@ -95,9 +92,9 @@ class AuthRepository extends BaseService {
 
       delete newUserDto.device_id;
       const user = await this.create(newUserDto);
-      
+
       let html = "";
-     await sendOtp(createUserDto.email, html,user);
+      await sendOtp(createUserDto.email, html, user);
 
       await UserSession.create({
         user_id: user.dataValues.id,
@@ -166,7 +163,7 @@ class AuthRepository extends BaseService {
       client_id: this.auth0ClientId,
     };
 
-
+    console.log('auth0UserData.....................................',auth0UserData)
     const auth0User = await axios
       .post(`${this.auth0BaseUrl}/dbconnections/signup`, auth0UserData, {
         headers: { 'Authorization': auth0Header.baseHeaders(oauth).Authorization }
@@ -178,8 +175,6 @@ class AuthRepository extends BaseService {
           data: result.data,
         };
       })
-
-
       .catch((error) => {
         return {
           status: error.response.status,
@@ -229,7 +224,7 @@ class AuthRepository extends BaseService {
         console.log(error.response.data);
         return error.response.data;
       });
-   
+     
     return result;
   }
 
@@ -239,7 +234,7 @@ class AuthRepository extends BaseService {
         email: loginDto.email,
         password: loginDto.password,
       });
-       if (!loginUser.data) {
+      if (!loginUser.data) {
         return {
           statusCode: 400,
           message: "invalid username or password",
@@ -247,14 +242,12 @@ class AuthRepository extends BaseService {
       }
 
       // fetch user logged in with email id
-      let loggedInUser = await this.model.findOne({where:{email: loginDto.email}});
-       
- 
+      let loggedInUser = await this.model.findOne({
+        where: { email: loginDto.email },
+      });
 
-      loggedInUser.access_token = loginUser.data.access_token
-      await  loggedInUser.save();
-
-     
+      loggedInUser.access_token = loginUser.data.access_token;
+      await loggedInUser.save();
 
       // remove sessions with already existing device id
       await UserSession.destroy({
@@ -393,13 +386,11 @@ class AuthRepository extends BaseService {
   //   }
   // }
 
-
   async changeUserPassword(id, changePasswordDto) {
     try {
-     
       const user = await this.getById(id);
       let passwordUpdated = false;
-      
+
       const authUser = await this.getAuth0UserById(user.auth0_user_id);
 
       if (authUser.status == "404") {
@@ -407,35 +398,30 @@ class AuthRepository extends BaseService {
       } else {
         const auth0_user_id = authUser.data.user_id;
 
-        
-          const changePassword = await this.auth0UserPasswordChange(
-            auth0_user_id,
-            {
-              email: changePasswordDto.email,
-              password: changePasswordDto.password,
-              confirmPassword: changePasswordDto.confirmPassword,
-            }
-          );
-
-          if (changePassword.status == 200) {
-            await this.update(id, {
-              password: validation.hashPassword(changePasswordDto.password),
-            });
+        const changePassword = await this.auth0UserPasswordChange(
+          auth0_user_id,
+          {
+            email: changePasswordDto.email,
+            password: changePasswordDto.password,
+            confirmPassword: changePasswordDto.confirmPassword,
           }
-          return changePassword;
-         
-       // return passwordUpdated;
+        );
+
+        if (changePassword.status == 200) {
+          await this.update(id, {
+            password: validation.hashPassword(changePasswordDto.password),
+          });
+        }
+        return changePassword;
+
+        // return passwordUpdated;
       }
     } catch (e) {
       throw ono(e);
     }
   }
 
-
-
-
   async verifyOtp(body) {
-
     try {
       const existingUser = await Users.findOne({
         where: { email: body.email },
@@ -443,96 +429,87 @@ class AuthRepository extends BaseService {
           [Op.gte]: new Date(),
         },
       });
-      if(!existingUser){
-        return 'user does not exists'
+      if (!existingUser) {
+        return "user does not exists";
       }
       if (
         parseInt(existingUser.no_of_attempts) >=
         parseInt(constants.otpNoOfAttempts)
       ) {
         let message = {
-            message:constants.otpNoOfAttemptsMessage,
-            success:false
-        }
+          message: constants.otpNoOfAttemptsMessage,
+          success: false,
+        };
         return message;
       }
 
       if (parseInt(existingUser.otp) !== parseInt(body.otp)) {
         let result = await retryAttemptsForVerifyOtp(existingUser);
-        console.log(result)
+        console.log(result);
         let message = {
-          message:constants.INVALID_OTP,
-          status:false
-      }
+          message: constants.INVALID_OTP,
+          status: false,
+        };
         return message;
-      }  
-     let result = await modifyResponseForVerifyOtp(existingUser);
-     return result;
-      
+      }
+      let result = await modifyResponseForVerifyOtp(existingUser);
+      return result;
     } catch (e) {
       return e;
     }
   }
 
+  async logOut(userId) {
+    // try{
+    //   const user = await Users.findOne({
+    //     where: { id: userId },
 
-  async logOut(userId){
-        // try{
-        //   const user = await Users.findOne({
-        //     where: { id: userId },
-            
-        //   });
-        //   console.log('user  before  logout',user)
+    //   });
+    //   console.log('user  before  logout',user)
 
-        //   user.access_token=null
-        //   console.log('user  after logout',user)
-        // }
-        // catch(e){
+    //   user.access_token=null
+    //   console.log('user  after logout',user)
+    // }
+    // catch(e){
 
-        // }
+    // }
 
+    try {
+      const user = await Users.findOne({
+        where: { id: userId },
+      });
 
-        try{
+      console.log("user  before  logout", user.access_token);
+      let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
+      let randomIndex = Math.floor(Math.random() * 10 + 1);
+      let hashedRandomNumberToAppend = await bcrypt.hash(
+        randomNumberToAppend,
+        10
+      );
 
-                  const user = await Users.findOne({
-            where: { id: userId },
-            
-          });
-         
+      user.access_token = user.access_token + hashedRandomNumberToAppend;
 
-          console.log('user  before  logout',user.access_token)
-          let randomNumberToAppend = toString(Math.floor((Math.random() * 1000) + 1));
-          let randomIndex = Math.floor((Math.random() * 10) + 1);
-          let hashedRandomNumberToAppend = await bcrypt.hash(randomNumberToAppend, 10);
-      
-           
-          user.access_token = user.access_token + hashedRandomNumberToAppend;
-           
-          return  'logout successfully!';
-      }catch(err){
-          return  err
-      }
-
+      return "logout successfully!";
+    } catch (err) {
+      return err;
+    }
   }
 
-  
-async resendOtp(userData){
-  
-let message=''
-  const user = await Users.findOne({
-    where: { email: userData.email },
-    
-  });
- 
-  if(!user){
-    message='user does not exists!'
-    return  message
-  }
-  let html = ''
-    await sendOtp(userData.email, html,user);
-  message=constants.otpMessage
-  return message
-}
-}
+  async resendOtp(userData) {
+    let message = "";
+    const user = await Users.findOne({
+      where: { email: userData.email },
+    });
 
+    if (!user) {
+      message = "user does not exists!";
+      return message;
+    }
+    let html = "";
+    await sendOtp(userData.email, html, user);
+    message = constants.otpMessage;
+    return message;
+  }
+}
 
 module.exports = new AuthRepository(Users);

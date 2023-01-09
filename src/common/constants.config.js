@@ -45,6 +45,11 @@ module.exports = {
         secretAccessKey:process.env.AWS_SECRET_KEY,
         apiVersion: "2010-12-01"
     },
+
+    ERROR_MESSAGE:{
+        PASSWORD_ERROR_MESSAGE:"Password must contain one digit from 1 to 9, one lowercase letter, one uppercase letter, one special character, no space, and it must be 6-16 characters long.",
+        EMAIL_ERROR_MESSAGE:"Please provide a valid email address."
+    },
     otpNoOfAttempts:'3',
    
     otpNoOfAttemptsMessage:"You've reached the maximum no.of.attempts!.try Resend OTP  and try again!",
@@ -62,5 +67,6 @@ module.exports = {
     return otp + ' is your OTP for your account!';
   },
 
+  
   
 };
