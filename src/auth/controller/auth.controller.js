@@ -32,12 +32,12 @@ class AuthController extends BaseController {
 
       let success = false;
 
-      let requiredFields = await signUpRequiredFields();
-      let validations = await fieldValidation(req, requiredFields);
+      // let requiredFields = await signUpRequiredFields();
+      // let validations = await fieldValidation(req, requiredFields);
        
-        if (validations.statusCode === 400) {
-          return { success: success, data:validations };
-        }
+      //   if (validations.statusCode === 400) {
+      //     return { success: success, data:validations };
+      //   }
        
 
       const createDto = this.dto.createUser(req);
@@ -50,25 +50,25 @@ class AuthController extends BaseController {
       return e;
     }
   }
-
+   
   async login(req) {
     try {
-      let requiredFields = await loginRequiredFields();
-      let validations = await fieldValidation(req, requiredFields);
+      // let requiredFields = await loginRequiredFields();
+      // let validations = await fieldValidation(req, requiredFields);
 
-      if (req) {
-        if (validations.data.statusCode === 400) {
-          return { success: success, data:validations };
-        }
-      }
+      // if (req) {
+      //   if (validations.data.statusCode === 400) {
+      //     return { success: success, data:validations };
+      //   }
+      // }
       let success = false;
 
       const loginDto = this.dto.loginUser(req);
 
       const login = await this.repository.login(loginDto);
-
+      console.log('login................',login)
       if (login.statusCode === 400) {
-        return { success: success, data:validations };
+        return { success: success, data:login };
       }
       return { success: !success, data: login };
     } catch (e) {
@@ -81,15 +81,7 @@ class AuthController extends BaseController {
     try {
       let success = false;
       const otpDto = this.dto.verifyOtpDto(req);
-      let requiredFields = await verifyOtpRequiredFields();
-
-      let validations = await fieldValidation(req, requiredFields);
-
-      if (req) {
-        if (validations.statusCode === 400) {
-          return { success: success, data:validations };
-        }
-      }
+       
       const verifyOtp = await this.repository.verifyOtp(otpDto);
       return { success: !success, data: verifyOtp };
     } catch (e) {
@@ -99,13 +91,7 @@ class AuthController extends BaseController {
   async resendOtp(req) {
     try {
       let success = false;
-      let requiredFields = await resendOtpRequiredFields();
-      let validations = await fieldValidation(req, requiredFields);
-
-      if (validations.statusCode === 400) {
-        return { success: success, data:validations };
-      }
-
+       
       const resendOtpDto = this.dto.resendOtpDto(req);
       const otp = await this.repository.resendOtp(resendOtpDto);
       return { success: !success, data: otp };
@@ -169,15 +155,7 @@ class AuthController extends BaseController {
 
   async changePassword(req, res) {
     try {
-      let requiredFields = await changePasswordRequiredFields();
-
-      if (req.body) {
-        let validate = await validation.validation(req.body, requiredFields);
-
-        if (validate.data.statusCode === 400) {
-          return validate;
-        }
-      }
+       
       let success = false;
       const id = req.user.id;
       const changePasswordDto = this.dto.changeUserPassword(req.body);

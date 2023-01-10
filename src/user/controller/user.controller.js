@@ -2,15 +2,8 @@ const BaseController = require("../../common/controllers/base.controller");
 const userRepository = require("../repository/user.repository");
 const userDto = require("../middleware/user.dto");
 const responseService = require("../../common/services/response.service");
-const validation = require("../../shared/middleware/validate.middleware");
-const userValidation = require("../middleware/user.validation");
-const {
  
-  
-  roleCreateRequiredFields,
- 
-} = require("../middleware/user.validation");
- 
+
 class UserController extends BaseController {
   constructor(respService, repository, dto) {
     super(respService, repository, dto);
@@ -20,19 +13,8 @@ class UserController extends BaseController {
 
   async roleCreate(req) {
     try {
-
       let success = false;
 
-      
-      let requiredFields = await roleCreateRequiredFields();
-      let validations = await fieldValidation(req, requiredFields);     
-      
-         
-
-        if (validations.statusCode === 400) {
-          return { success: success, data:validations };
-        }
-      
       const roleCreateDto = this.dto.roleCreateDto(req.body);
 
       const record = await this.repository.createRoles(roleCreateDto);
@@ -47,18 +29,7 @@ class UserController extends BaseController {
     try {
       let success = false;
 
-      
-      let requiredFields = await roleCreateRequiredFields();
-      let validations = await fieldValidation(req.body, requiredFields);     
-      
-         
-
-        if (validate.data.statusCode === 400) {
-          return { success: success, data:validations };
-        }
       const updateRoleDto = this.dto.updateRole(req.body);
-
-     
 
       const updateRole = await this.repository.updateRoles(
         req.user.id,
@@ -66,29 +37,13 @@ class UserController extends BaseController {
       );
 
       return { success: !success, data: updateRole };
-       
     } catch (e) {
       console.log(e);
-
-    
     }
   }
 
   async profileUpdate(req) {
     try {
-      let requiredFields = {
-        firstName: "",
-        lastName: "",
-        dob: "",
-        gender: "",
-      };
-      if (req.body) {
-        let validate = await validation.validation(req.body, requiredFields);
-
-        if (validate.data.statusCode === 400) {
-          return validate;
-        }
-      }
       let success = false;
       const updateProfileDto = this.dto.updateProfileDto(req.body);
 

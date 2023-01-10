@@ -1,12 +1,9 @@
 const { object } = require("joi");
 
-const emailValidator = require("deep-email-validator");
-const validation = require("../../shared/middleware/validate.middleware");
+ const validation = require("../../shared/middleware/validate.middleware");
 const constants = require("../../common/constants.config");
 
-async function isEmailValid(email) {
-  return emailValidator.validate(email);
-}
+ 
 
 exports.signUpRequiredFields = async () => {
   let requiredFields = {

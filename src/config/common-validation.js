@@ -131,3 +131,22 @@ exports.fieldValidation = async (body, requiredFields) => {
     validate,
   };
 };
+
+
+module.exports = {
+  addUserCreateValidation: async (req, res, next) => {
+
+     
+      const value = await user.validate(req);
+      if (value.error) {
+            let data = {
+              success: false,
+              statusCode: 400,
+              message: value.error.details[0].message
+          }
+          throw data
+      } else {
+          next();
+      }
+  }
+};

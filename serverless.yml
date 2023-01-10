@@ -7,8 +7,8 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   layers:
-    - arn:aws:lambda:us-east-1:271340019780:layer:NodeDependenciesLayer:1
-    - arn:aws:lambda:us-east-1:271340019780:layer:ServerlessDependenciesLayer:1
+    - arn:aws:lambda:us-east-1:271340019780:layer:NodeDependenciesLayer:7
+    - arn:aws:lambda:us-east-1:271340019780:layer:ServerlessDependenciesLayer:2
     
   package:
     individually: true

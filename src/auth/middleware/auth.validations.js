@@ -1,29 +1,28 @@
-const Joi = require('joi');
+const joi = require("joi");
 
-const createUser = {
-    body: Joi.object().keys({
+const schema = {
+    userCreate: joi.object({
+        email: joi.string().email().required(),
+        password: joi.string().pattern(new RegExp("^^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$")).required(),
+        device_id: joi.string().required()
+    }),
+
+    verifyOtp: joi.object({
+        email: joi.string().email().required(),
+        otp: joi.string().required()
+    }),
+
+    
+   resendOtp: joi.object({
+        email: joi.string().email().required(),
         
-        email: Joi.string().email({ tlds: { allow: false } }).required(),
-        password: Joi.string().min(8).required(),
-        device_id: Joi.string().required(),
+    }),
+
+    changePassword: joi.object({
+        password: joi.string().pattern(new RegExp("^^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$")).required(),
+        confirmPassword:joi.string().required()
+        
     }),
 };
 
-const loginUser = {
-    body: Joi.object().keys({
-        email: Joi.string().email({ tlds: { allow: false } }).required(),
-        password: Joi.string().min(8).required(),
-        device_id: Joi.string().required(),
-    }),
-};
-const sendVerificationMail = {
-    body: Joi.object().keys({
-        id:Joi.number().required()
-    }),
-};
-
-module.exports = {
-    createUser,
-    loginUser,
-    sendVerificationMail
-};
+module.exports = schema;

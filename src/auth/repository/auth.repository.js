@@ -57,9 +57,9 @@ class AuthRepository extends BaseService {
 
       // If user doesn't exist in auth0 create a user
       const createdAuth0User = await this.createAuth0User(createUserDto, oauth);
-      console.log("createdAuth0User....", createdAuth0User);
+      
       if (!createdAuth0User.data) {
-        console.log("createdAuth0User.... inside ");
+        
 
         throw ono(createdAuth0User);
       }
@@ -141,7 +141,6 @@ class AuthRepository extends BaseService {
         };
       })
       .catch((error) => {
-        console.log("existing aut0 error", error);
         return {
           status: error,
           message: error,
@@ -221,7 +220,6 @@ class AuthRepository extends BaseService {
         };
       })
       .catch((error) => {
-        console.log(error.response.data);
         return error.response.data;
       });
      
@@ -236,6 +234,8 @@ class AuthRepository extends BaseService {
       });
       if (!loginUser.data) {
         return {
+
+          success:false,
           statusCode: 400,
           message: "invalid username or password",
         };

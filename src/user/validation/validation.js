@@ -1,13 +1,12 @@
 const bcrypt = require("bcryptjs");
 
-const { userCreate,verifyOtp,changePassword,resendOtp } = require("../middleware/auth.validations");
+const {profileUpdate,roleCreate,updateRole } = require("../middleware/user.validation");
 const saltRounds = 10;
 
 const salt = bcrypt.genSaltSync(saltRounds);
 const hashPassword = (password) => bcrypt.hashSync(password, salt);
 
-const { user } = require("../middleware/auth.validations");
-
+ 
 /**
  * comparePassword
  * @param {string} hashPassword
@@ -19,9 +18,11 @@ const comparePassword = (hashedPassword, password) => {
   return bcrypt.compareSync(password, hashedPassword);
 };
 
-const addUserCreateValidation = async (req) => {
+ 
+
+const roleCreateValidation = async (req) => {
   try {
-    const value = await userCreate.validate(req);
+    const value =   roleCreate.validate(req);
 
     if (value.error) {
       let data = {
@@ -40,30 +41,9 @@ const addUserCreateValidation = async (req) => {
   }
 };
 
-const verifyOtpValidation = async (req) => {
-  try {
-    const value =   verifyOtp.validate(req);
-
-    if (value.error) {
-      let data = {
-        data: {
-          success: false,
-          statusCode: 400,
-          message: value.error.details[0].message,
-        },
-      };
-      throw data;
-    } else {
-      return true;
-    }
-  } catch (e) {
-    throw e;
-  }
-};
-
-const resendOtpValidation = async (req) => {
+const updateRoleValidation = async (req) => {
+     const value =   updateRole.validate(req);
    
-    const value =   resendOtp.validate(req);
 
     if (value.error) {
       let data = {
@@ -82,9 +62,9 @@ const resendOtpValidation = async (req) => {
 };
 
 
-const  changePasswordValidation = async (req) => {
+const  profileUpdateValidation = async (req) => {
    
-  const value =   changePassword.validate(req);
+  const value =   profileUpdate.validate(req);
 
   if (value.error) {
     let data = {
@@ -106,10 +86,9 @@ const  changePasswordValidation = async (req) => {
 module.exports = {
   hashPassword,
   comparePassword,
-  addUserCreateValidation,
-  verifyOtpValidation,
-  resendOtpValidation,
-  changePasswordValidation
+  profileUpdateValidation,
+  updateRoleValidation,
+  roleCreateValidation
 };
 
 exports.verifyOtpRequiredFields = async () => {
