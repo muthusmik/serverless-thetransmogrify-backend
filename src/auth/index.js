@@ -1,6 +1,7 @@
 let AuthController = require("../auth/controller/auth.controller");
 const responseService = require("../common/services/response.service");
 let jwt = require("../auth/middleware/auth.jwt");
+const constants = require("../common/constants.config");
 
 const { addUserCreateValidation,verifyOtpValidation,resendOtpValidation,changePasswordValidation } = require("../auth/validation/validation");
 
@@ -15,28 +16,14 @@ module.exports.createUsers = async (event, context, callback) => {
     console.log("testing working fine", category);
     callback(null, {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(category),
     });
   } catch (err) {
     console.log("indesx error ", err);
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -53,27 +40,13 @@ module.exports.login = async (event, context, callback) => {
 
     callback(null, {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(category),
     });
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -97,14 +70,7 @@ module.exports.changePassword = async (event, context, callback) => {
 
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     } else {
@@ -113,14 +79,7 @@ module.exports.changePassword = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -138,27 +97,13 @@ module.exports.verifyOtp = async (event, context, callback) => {
 
     callback(null, {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(category),
     });
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -174,27 +119,13 @@ module.exports.resendOtp = async (event, context, callback) => {
 
     callback(null, {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(category),
     });
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -210,27 +141,13 @@ module.exports.forgotPassword = async (event, context, callback) => {
 
     callback(null, {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(category),
     });
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -243,7 +160,7 @@ module.exports.logOut = async (event, context, callback) => {
       token,
     };
     if (event.headers.Authorization) {
-      let resu = await jwt.verifyJwt(req);
+       await jwt.verifyJwt(req);
 
       req.body = JSON.parse(event.body);
 
@@ -252,14 +169,7 @@ module.exports.logOut = async (event, context, callback) => {
 
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     } else {
@@ -268,14 +178,7 @@ module.exports.logOut = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }

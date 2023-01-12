@@ -9,9 +9,11 @@ const sendOtp = async (mailAddress, mailHtml = "",user) => {
     let OTP = constants.genOtp();
 
     let mail = await sendEmail(mailAddress, OTP);
+
+  
     const otpExpiredAt = todayDate.setMinutes(todayDate.getMinutes() + 5);
 
-     
+      
     user.otp=OTP;
     user.otp_expiration=otpExpiredAt;
     user.no_of_attempts=0

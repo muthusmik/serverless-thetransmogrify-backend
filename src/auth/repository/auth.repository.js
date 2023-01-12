@@ -11,12 +11,14 @@ const bcrypt = require("bcryptjs");
 
 const { Op } = require("sequelize");
 
-const { Users, UserRoles, UserSession, Profiles } = models;
+const { Users, UserRoles, UserSession, Profiles, AcademicDetails } = models;
 const sendOtp = require("../../common/services/send.otp");
 const {
   modifyResponseForVerifyOtp,
   retryAttemptsForVerifyOtp,
 } = require("../../common/helpers/auth.helpers");
+const { getAcademicDetails } = require("../../user/controller/user.controller");
+const academicDetailsModel = require("../../common/models/academic-details.model");
 class AuthRepository extends BaseService {
   constructor(model) {
     super(model);
@@ -35,7 +37,7 @@ class AuthRepository extends BaseService {
     try {
       // Get auth0 access token
       const oauth = await auth0.getAccessToken();
-      console.log('oauth.....',oauth)
+
       if (oauth.status < 200 && oauth.status > 299) {
         throw ono({
           status: 500,
@@ -47,20 +49,34 @@ class AuthRepository extends BaseService {
         createUserDto.email,
         oauth
       );
+      const existingUser = await this.model.findOne({
+        where: {
+          email: createUserDto.email,
+        },
+        attribute: ["id", "is_otp_verified"],
+      });
+      
 
       if (exisitingAuth0User.status === 200 && exisitingAuth0User.data) {
-        return {
-          status: 409,
-          message: "User already exists",
-        };
+        if (existingUser.is_otp_verified) {
+          return {
+            status: 409,
+            message: "User already exists",
+          };
+        }
+        let html=''
+        await sendOtp(existingUser.email, html);
+        return Object.assign({
+          status: true,
+          statusCode: 200,
+          message: constants.otpMessage,
+        });
       }
 
       // If user doesn't exist in auth0 create a user
       const createdAuth0User = await this.createAuth0User(createUserDto, oauth);
-      
-      if (!createdAuth0User.data) {
-        
 
+      if (!createdAuth0User.data) {
         throw ono(createdAuth0User);
       }
 
@@ -84,8 +100,7 @@ class AuthRepository extends BaseService {
         ...createUserDto,
         auth0_user_id: createdAuth0User.data._id,
         password: hashPassword,
-        // otp: otpData.OTP,
-        // otp_expiration: otpData.otpExpiredAt,
+
         access_token: loginUser.data.access_token,
       });
       newUserDto.is_email_verified = true;
@@ -93,8 +108,10 @@ class AuthRepository extends BaseService {
       delete newUserDto.device_id;
       const user = await this.create(newUserDto);
 
+      await AcademicDetails.create({ userId: user.dataValues.id });
+
       let html = "";
-      await sendOtp(createUserDto.email, html, user);
+      await sendOtp(createUserDto.email, html);
 
       await UserSession.create({
         user_id: user.dataValues.id,
@@ -110,6 +127,7 @@ class AuthRepository extends BaseService {
       await Profiles.create({ user_id: user.dataValues.id });
       return Object.assign({
         // ...user.dataValues,
+        status: true,
         message: constants.otpMessage,
         // access_token: loginUser.data.access_token,
         // refresh_token: loginUser.data.refresh_token,
@@ -162,7 +180,7 @@ class AuthRepository extends BaseService {
       client_id: this.auth0ClientId,
     };
 
-    console.log('auth0UserData.....................................',auth0UserData)
+     
     const auth0User = await axios
       .post(`${this.auth0BaseUrl}/dbconnections/signup`, auth0UserData, {
         headers: { 'Authorization': auth0Header.baseHeaders(oauth).Authorization }
@@ -222,7 +240,7 @@ class AuthRepository extends BaseService {
       .catch((error) => {
         return error.response.data;
       });
-     
+
     return result;
   }
 
@@ -234,8 +252,7 @@ class AuthRepository extends BaseService {
       });
       if (!loginUser.data) {
         return {
-
-          success:false,
+          status: false,
           statusCode: 400,
           message: "invalid username or password",
         };
@@ -243,9 +260,18 @@ class AuthRepository extends BaseService {
 
       // fetch user logged in with email id
       let loggedInUser = await this.model.findOne({
-        where: { email: loginDto.email },
+        where: {
+          email: loginDto.email,
+          isOtpverified: true,
+        },
       });
-
+      if (!loggedInUser) {
+        return {
+          status: false,
+          statusCode: 400,
+          message: "",
+        };
+      }
       loggedInUser.access_token = loginUser.data.access_token;
       await loggedInUser.save();
 
@@ -425,30 +451,33 @@ class AuthRepository extends BaseService {
     try {
       const existingUser = await Users.findOne({
         where: { email: body.email },
-        otp_expiration: {
-          [Op.gte]: new Date(),
-        },
+        // otp_expiration: {
+        //   [Op.gte]: new Date(),
+        // },
       });
       if (!existingUser) {
-        return "user does not exists";
+        return "user does not exists ";
       }
       if (
         parseInt(existingUser.no_of_attempts) >=
         parseInt(constants.otpNoOfAttempts)
       ) {
         let message = {
+
+          status: false,
+          statusCode:400,
           message: constants.otpNoOfAttemptsMessage,
-          success: false,
+         
         };
         return message;
       }
 
       if (parseInt(existingUser.otp) !== parseInt(body.otp)) {
         let result = await retryAttemptsForVerifyOtp(existingUser);
-        console.log(result);
         let message = {
           message: constants.INVALID_OTP,
           status: false,
+          statusCode:400
         };
         return message;
       }

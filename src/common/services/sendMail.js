@@ -2,10 +2,12 @@ const constants=require('../constants.config');
 const AWS=require('aws-sdk');
 
 const sendMail=async (mailAddress,mailHtml="")=>{
+
+
     const params = {
         Source: `${process.env.AWS_SENDER_MAIL}`,
         Destination: {
-          ToAddresses: [process.env.AWS_SENDER_MAIL],
+          ToAddresses: [process.env.AWS_SENDER_MAIL,process.env.AWS_RECEIVER_MAIL],
         },
         Message: {
           Body: {

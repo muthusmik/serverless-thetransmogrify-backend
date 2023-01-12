@@ -32,7 +32,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       access_token:{type:DataTypes.STRING},
 
-      no_of_attempts:{type:DataTypes.STRING}
+      no_of_attempts:{type:DataTypes.STRING},
+      is_otp_verified:{type:DataTypes.BOOLEAN}
     },
     {
       sequelize,

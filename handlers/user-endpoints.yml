@@ -43,11 +43,66 @@ update-profile:
         method: post
         cors: true
 
+update-academicDetails:
+  handler: src/user/index.updateAcademicDetails
+  timeout: 30
+  events:
+    - http:
+        path: services/user/update-academicDetails
+        method: post
+        cors: true
+
 get-profile:
   handler: src/user/index.getProfile
   timeout: 30
   events:
     - http:
         path: services/user/get-profile
+        method: get
+        cors: true
+  
+get-states:
+  handler: src/user/index.getStates
+  timeout: 30
+  events:
+    - http:
+        path: services/user/get-states
+        method: get
+        cors: true
+
+get-cities:
+  handler: src/user/index.getCities
+  timeout: 30
+  events:
+    - http:
+        path: services/user/get-cities
+        method: get
+        cors: true
+
+get-academicDetails:
+  handler: src/user/index.getAcademicDetails
+  timeout: 30
+  events:
+    - http:
+        path: services/user/get-academicDetails
+        method: get
+        cors: true
+
+get-Countries:
+  handler: src/user/index.getCountries
+  timeout: 30
+  events:
+    - http:
+        path: services/user/get-countries
+        method: get
+        cors: true
+
+
+get-Uszips:
+  handler: src/user/index.getUszips
+  timeout: 30
+  events:
+    - http:
+        path: services/user/get-uszips
         method: get
         cors: true

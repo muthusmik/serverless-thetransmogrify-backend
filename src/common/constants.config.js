@@ -51,6 +51,27 @@ module.exports = {
         EMAIL_ERROR_MESSAGE:"Please provide a valid email address."
     },
     otpNoOfAttempts:'3',
+    headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+      },
+      AUTH_RESPONSE:{
+        INVALID_TOKEN_MESSAGE:"Invalid access token",
+        EXISTS_USER_MESSAGE:"User already exists",
+        GRANT_TYPE: "password",
+        ACCEPT_ENCODING:"gzip,deflate,compress",
+        INVALIDE_USERNAME_PASSWORD:"invalid username or password",
+        CONTENT_TYPE:"application/x-www-form-urlencoded",
+        INVALID_USER_MESSAGE:"user does not exists!",
+        LOGOUT_MESSAGE:"logout successfully!",
+        PASSWORD_CONFIRMPASSWORD_SAME:"password and confirm password must be same!",
+        PASSWORD_SUCCESSFULLY_CHANGED:"password changed successfully!",
+      },
+
    
     otpNoOfAttemptsMessage:"You've reached the maximum no.of.attempts!.try Resend OTP  and try again!",
     expiration:{

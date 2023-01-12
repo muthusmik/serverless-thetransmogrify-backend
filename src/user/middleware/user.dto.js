@@ -31,6 +31,17 @@ class UserDto extends BaseDto {
       gender:body.gender
     }
   }
+
+  academicDetailsDto(body){
+
+    return{
+     
+      schoolId:body.schoolId,
+      graduationYear:body.graduationYear,
+      userId:body.userId,
+      isAdult:body.isAdult
+    }
+  }
    
 }
 

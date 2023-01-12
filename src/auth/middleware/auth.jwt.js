@@ -24,10 +24,14 @@ module.exports = {
       let auth0Id = decoded.sub;
 
       auth0Id = auth0Id.substring(6);
-      let existingUser = await authRepo.findUserWithDatabase(auth0Id);
 
-       if(!existingUser){
-        return "unauthorize"
+      
+      let existingUser = await authRepo.findUserWithDatabase(auth0Id);
+    
+       if(existingUser === null){
+        
+
+        return false
       }
       req.user = existingUser;
      

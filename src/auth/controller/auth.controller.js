@@ -29,16 +29,7 @@ class AuthController extends BaseController {
 
   async create(req) {
     try {
-
       let success = false;
-
-      // let requiredFields = await signUpRequiredFields();
-      // let validations = await fieldValidation(req, requiredFields);
-       
-      //   if (validations.statusCode === 400) {
-      //     return { success: success, data:validations };
-      //   }
-       
 
       const createDto = this.dto.createUser(req);
 
@@ -46,30 +37,22 @@ class AuthController extends BaseController {
 
       return { success: !success, data: record };
     } catch (e) {
-      console.log("e...", e);
+      
       return e;
     }
   }
-   
+
   async login(req) {
     try {
-      // let requiredFields = await loginRequiredFields();
-      // let validations = await fieldValidation(req, requiredFields);
-
-      // if (req) {
-      //   if (validations.data.statusCode === 400) {
-      //     return { success: success, data:validations };
-      //   }
-      // }
       let success = false;
 
       const loginDto = this.dto.loginUser(req);
 
       const login = await this.repository.login(loginDto);
-      console.log('login................',login)
-      if (login.statusCode === 400) {
-        return { success: success, data:login };
-      }
+ 
+      // if (login.statusCode === 400) {
+      //   return { success: success, data: login };
+      // }
       return { success: !success, data: login };
     } catch (e) {
       delete e.stack;
@@ -81,7 +64,7 @@ class AuthController extends BaseController {
     try {
       let success = false;
       const otpDto = this.dto.verifyOtpDto(req);
-       
+
       const verifyOtp = await this.repository.verifyOtp(otpDto);
       return { success: !success, data: verifyOtp };
     } catch (e) {
@@ -91,7 +74,7 @@ class AuthController extends BaseController {
   async resendOtp(req) {
     try {
       let success = false;
-       
+
       const resendOtpDto = this.dto.resendOtpDto(req);
       const otp = await this.repository.resendOtp(resendOtpDto);
       return { success: !success, data: otp };
@@ -155,7 +138,6 @@ class AuthController extends BaseController {
 
   async changePassword(req, res) {
     try {
-       
       let success = false;
       const id = req.user.id;
       const changePasswordDto = this.dto.changeUserPassword(req.body);

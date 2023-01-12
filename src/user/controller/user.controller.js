@@ -3,7 +3,6 @@ const userRepository = require("../repository/user.repository");
 const userDto = require("../middleware/user.dto");
 const responseService = require("../../common/services/response.service");
  
-
 class UserController extends BaseController {
   constructor(respService, repository, dto) {
     super(respService, repository, dto);
@@ -79,6 +78,95 @@ class UserController extends BaseController {
       return { success: !success, data: roles };
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async getAllStates() {
+    try {
+
+      
+      let success = false;
+
+      const updateRole = await this.repository.getStates();
+
+      return { success: !success, data: updateRole };
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+
+  async getAllCities() {
+    try {
+
+      
+      let success = false;
+
+      const updateRole = await this.repository.getCities();
+
+      return { success: !success, data: updateRole };
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+
+  async getAcademicDetails(req) {
+    try {
+      let success = false;
+      let userId = req.user.id;
+      const getAcademicDetails = await this.repository.getUserAcademicDetails(userId);
+      return { success: !success, data: getAcademicDetails };
+    } catch (e) {
+      return e;
+    }
+  }
+  
+    async getAllCountries() {
+    try {
+
+     
+      let success = false;
+
+      const updateRole = await this.repository.getAllCountries();
+
+      return { success: !success, data: updateRole };
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getAllUszips() {
+    try {
+
+  
+      let success = false;
+
+      const updateRole = await this.repository.getAllUszips();
+
+      return { success: !success, data: updateRole };
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+
+
+
+  async academicDetailsUpdate(req) {
+    try {
+      let success = false;
+      const academicDetailsDto = this.dto.academicDetailsDto(req.body);
+
+      const updateProfile = await this.repository.academicDetailsUpdate(
+        req.user.id,
+        academicDetailsDto
+      );
+
+      return { success: !success, data: updateProfile };
+    } catch (e) {
+      console.log(e);
+      return e;
     }
   }
 }

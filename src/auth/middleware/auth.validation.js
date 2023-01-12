@@ -5,23 +5,23 @@ const constants = require("../../common/constants.config");
 
  
 
-exports.signUpRequiredFields = async () => {
-  let requiredFields = {
-    email: "",
-    password: "",
-    device_id: "",
-  };
-  return requiredFields;
-};
+// exports.signUpRequiredFields = async () => {
+//   let requiredFields = {
+//     email: "",
+//     password: "",
+//     device_id: "",
+//   };
+//   return requiredFields;
+// };
 
-const isEmail = (email) => {
-  const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+// const isEmail = (email) => {
+//   const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
 
    
-  return regex.test(email);
-};
+//   return regex.test(email);
+// };
 
-exports.isEmail = isEmail;
+// exports.isEmail = isEmail;
 
 const isMobileNumber = (mobileNumber) => {
   const regex = /^[0]?[6789]\d{9}$/;

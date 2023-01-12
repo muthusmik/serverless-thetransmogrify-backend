@@ -3,6 +3,7 @@ let userController = require("../user/controller/user.controller");
 let jwt = require("../auth/middleware/auth.jwt");
 const userValidation = require("./middleware/user.validation");
 const redgidtryValidate = require("../shared/middleware/validate.middleware");
+const constants = require("../common/constants.config");
 const {
   profileUpdateValidation,
   updateRoleValidation,
@@ -24,14 +25,7 @@ module.exports.createRole = async (event, context, callback) => {
 
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     } else {
@@ -40,14 +34,7 @@ module.exports.createRole = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -55,7 +42,6 @@ module.exports.createRole = async (event, context, callback) => {
 
 module.exports.updateRole = async (event, context, callback) => {
   try {
- 
     let token = event.headers.Authorization;
     let req = {
       token,
@@ -66,18 +52,11 @@ module.exports.updateRole = async (event, context, callback) => {
       req.body = JSON.parse(event.body);
 
       let valida = await updateRoleValidation(req.body);
-       let category = await userController.updateUserRole(req);
- 
+      let category = await userController.updateUserRole(req);
+
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     } else {
@@ -86,14 +65,7 @@ module.exports.updateRole = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -114,28 +86,14 @@ module.exports.updateProfile = async (event, context, callback) => {
 
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     }
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -156,14 +114,7 @@ module.exports.getRoles = async (event, context, callback) => {
 
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     } else {
@@ -172,14 +123,7 @@ module.exports.getRoles = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
@@ -196,20 +140,12 @@ module.exports.getProfile = async (event, context, callback) => {
 
       req.body = JSON.parse(event.body);
 
-      
       let category = await userController.getProfile(req);
       console.log("testing working fine....", category);
 
       callback(null, {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        },
+        headers:constants.headers,
         body: JSON.stringify(category),
       });
     } else {
@@ -218,15 +154,157 @@ module.exports.getProfile = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: err.statusCode || 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      },
+      headers:constants.headers,
       body: JSON.stringify(err),
     });
   }
 };
+
+module.exports.getStates = async (event, context, callback) => {
+  try {
+    let category = await userController.getAllStates();
+
+    callback(null, {
+      statusCode: 200,
+      headers:constants.headers,
+      body: JSON.stringify(category),
+    });
+  } catch (err) {
+    callback(null, {
+      statusCode: err.statusCode || 500,
+      headers:constants.headers,
+      body: JSON.stringify(err),
+    });
+  }
+};
+
+module.exports.getCities = async (event, context, callback) => {
+  try {
+    let category = await userController.getAllCities();
+
+    callback(null, {
+      statusCode: 200,
+      headers:constants.headers,
+      body: JSON.stringify(category),
+    });
+  } catch (err) {
+    callback(null, {
+      statusCode: err.statusCode || 500,
+      headers:constants.headers,
+      body: JSON.stringify(err),
+    });
+  }
+};
+
+module.exports.getAcademicDetails = async (event, context, callback) => {
+  try {
+    let token = event.headers.Authorization;
+    let req = {
+      token,
+    };
+    if (event.headers.Authorization) {
+      let jwtVerify = await jwt.verifyJwt(req);
+
+      if (jwtVerify === false) {
+        return "Unauthorized";
+      }
+      req.body = JSON.parse(event.body);
+
+     
+
+      let category = await userController.getAcademicDetails(req);
+      console.log("testing working fine....", category);
+
+      callback(null, {
+        statusCode: 200,
+        headers:constants.headers,
+        body: JSON.stringify(category),
+      });
+    } else {
+      return "unauthorizeds";
+    }
+  } catch (err) {
+    callback(null, {
+      statusCode: err.statusCode || 500,
+      headers:constants.headers,
+      body: JSON.stringify(err),
+    });
+  }
+};
+
+ 
+
+module.exports.getCountries = async (event, context, callback) => {
+  try {
+    
+
+        let category = await userController.getAllCountries();
+ 
+      callback(null, {
+        statusCode: 200,
+        headers:constants.headers,
+        body: JSON.stringify(category),
+      });
+     
+  } catch (err) {
+    callback(null, {
+      statusCode: err.statusCode || 500,
+      headers:constants.headers,
+      body: JSON.stringify(err),
+    });
+  }
+};
+
+module.exports.getUszips = async (event, context, callback) => {
+  try {
+    
+
+        let category = await userController.getAllUszips();
+ 
+      callback(null, {
+        statusCode: 200,
+        headers:constants.headers,
+        body: JSON.stringify(category),
+      });
+     
+  } catch (err) {
+    callback(null, {
+      statusCode: err.statusCode || 500,
+      headers:constants.headers,
+      body: JSON.stringify(err),
+    });
+  }
+};
+
+
+
+module.exports.updateAcademicDetails = async (event, context, callback) => {
+  try {
+    let token = event.headers.Authorization;
+    let req = {
+      token,
+    };
+    if (event.headers.Authorization) {
+    await jwt.verifyJwt(req);
+
+      req.body = JSON.parse(event.body);
+     // await profileUpdateValidation(req.body);
+      let category = await userController.academicDetailsUpdate(req);
+
+      callback(null, {
+        statusCode: 200,
+        headers:constants.headers,
+        body: JSON.stringify(category),
+      });
+    }
+  } catch (err) {
+    callback(null, {
+      statusCode: err.statusCode || 500,
+      headers:constants.headers,
+      body: JSON.stringify(err),
+    });
+  }
+};
+
+
+

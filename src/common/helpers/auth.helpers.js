@@ -7,10 +7,12 @@ exports.modifyResponseForVerifyOtp = async (existingUser)=>{
 
              existingUser.no_of_attempts=0
              existingUser.otp=null
+             existingUser.is_otp_verified = true
              let data = { 
                  
                 id: existingUser.id,
-                
+                status:true,
+                statusCode:200,
                 access_token:existingUser.access_token,
                 message:constants.OTP_SUCCESS_MESSAGE
             }
